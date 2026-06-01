@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LTLG — Indian Constitution Learning Platform
+
+An AI-powered Indian Constitution learning platform built with Next.js 15, TypeScript, Tailwind CSS, and shadcn/ui.
+
+## Features
+
+- **Dashboard** — Bookmarks (articles & cases), quick actions, quiz history (localStorage)
+- **Constitution Chat** — Premium legal-tech UI; ask **any** article (1–395, 51A, 300A, etc.)
+- **Constitution Explorer** — All **465 articles**, **12 schedules**, search & bookmarks
+- **Quiz Center** — Scored quizzes with explanations
+- **Landmark Cases** & **Amendments Hub** — Browse cases and major amendments
+- **Exam prep modules** — Flashcards, Legal News, Current Affairs, CLAT (coming soon)
+
+No login, signup, or authentication required.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command        | Description              |
+| -------------- | ------------------------ |
+| `npm run dev`  | Start development server |
+| `npm run build`| Production build         |
+| `npm run start`| Start production server  |
+| `npm run lint` | Run ESLint               |
+| `npm run build:constitution` | Regenerate `src/data/constitution.json` from source |
 
-## Learn More
+## Constitution data
 
-To learn more about Next.js, take a look at the following resources:
+Full article text is loaded from `src/data/constitution.json` (built from [civictech-India/constitution-of-india](https://github.com/civictech-India/constitution-of-india)). Run `npm run build:constitution` after updating `scripts/source-constitution.json`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
