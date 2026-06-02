@@ -22,7 +22,7 @@ export function ArticleDetail({
   onMarkRead,
 }: ArticleDetailProps) {
   return (
-    <div className="flex h-full flex-col">
+    <div className="relative z-0 flex min-h-0 flex-col">
       <div className="space-y-3 border-b border-border p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-2">
@@ -49,7 +49,7 @@ export function ArticleDetail({
           </Button>
         )}
       </div>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-4 p-6">
           <div>
             <h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">

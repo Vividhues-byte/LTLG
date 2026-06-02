@@ -52,7 +52,11 @@ export function ArticleCard({
         <div className="flex items-center justify-between">
           <span className="text-[11px] text-muted-foreground">{article.part}</span>
           <Link
-            href={`/explorer?article=${article.id}`}
+            href={`/chat?q=${encodeURIComponent(
+              article.number.toLowerCase().includes("preamble")
+                ? "Explain the Preamble"
+                : `Explain ${article.number}`
+            )}`}
             className="inline-flex items-center gap-0.5 text-xs font-medium text-primary hover:underline"
           >
             Read

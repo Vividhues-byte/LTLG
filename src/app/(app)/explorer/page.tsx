@@ -1,107 +1,53 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Bookmark, Search } from "lucide-react";
+import { Suspense, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Bookmark, Search, Loader2 } from "lucide-react";
 import {
   articleParts,
   constitutionSchedules,
-  getArticleById,
   searchArticles,
   searchSchedules,
 } from "@/data/constitution-loader";
 import { useProgressContext } from "@/contexts/progress-context";
-import { ArticleDetail } from "@/components/constitution/article-detail";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import type { ArticlePart } from "@/types";
-import type { ConstitutionSchedule } from "@/data/constitution-loader";
-
-function ScheduleDetail({ schedule }: { schedule: ConstitutionSchedule }) {
-  return (
-    <div className="flex h-full flex-col">
-      <div className="space-y-3 border-b border-border p-6">
-        <Badge>{schedule.number}</Badge>
-        <h1 className="text-2xl font-semibold tracking-tight">{schedule.title}</h1>
-        <p className="text-sm text-muted-foreground">{schedule.summary}</p>
-      </div>
-      <ScrollArea className="flex-1">
-        <pre className="whitespace-pre-wrap p-6 font-sans text-sm leading-relaxed text-foreground/90">
-          {schedule.content}
-        </pre>
-      </ScrollArea>
-    </div>
-  );
-}
+// import type { ConstitutionSchedule } from "@/data/constitution-loader";
 
 function ExplorerContent() {
-  const searchParams = useSearchParams();
-  const articleParam = searchParams.get("article");
+  const router = useRouter();
   const { toggleBookmark, isBookmarked, markArticleRead } = useProgressContext();
 
   const [tab, setTab] = useState<"articles" | "schedules">("articles");
   const [query, setQuery] = useState("");
-  const [partFilter, setPartFilter] = useState<ArticlePart | "all">("all");
   const [bookmarksOnly, setBookmarksOnly] = useState(false);
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
-  const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (articleParam) {
-      setTab("articles");
-      setSelectedArticleId(articleParam);
-      markArticleRead(articleParam);
-    }
-  }, [articleParam, markArticleRead]);
+  const [redirecting, setRedirecting] = useState(false);
+  const [redirectText, setRedirectText] = useState("");
 
   const filteredArticles = useMemo(() => {
     let results = searchArticles(query);
-    if (partFilter !== "all") {
-      results = results.filter((a) => a.part === partFilter);
-    }
-    if (bookmarksOnly) {
-      results = results.filter((a) => isBookmarked(a.id));
-    }
+    if (bookmarksOnly) results = results.filter((a) => isBookmarked(a.id));
     return results;
-  }, [query, partFilter, bookmarksOnly, isBookmarked]);
+  }, [query, bookmarksOnly, isBookmarked]);
 
   const filteredSchedules = useMemo(() => searchSchedules(query), [query]);
 
-  const selectedArticle = selectedArticleId ? getArticleById(selectedArticleId) : null;
-  const selectedSchedule =
-    selectedScheduleId
-      ? constitutionSchedules.find((s) => s.id === selectedScheduleId)
-      : null;
-
-  const selectArticle = useCallback(
-    (id: string) => {
-      setSelectedArticleId(id);
-      setSelectedScheduleId(null);
-      markArticleRead(id);
-    },
-    [markArticleRead]
-  );
-
-  useEffect(() => {
-    if (tab === "articles" && !selectedArticleId && filteredArticles.length > 0) {
-      setSelectedArticleId(filteredArticles[0].id);
-    }
-  }, [tab, filteredArticles, selectedArticleId]);
-
-  useEffect(() => {
-    if (tab === "schedules" && !selectedScheduleId && filteredSchedules.length > 0) {
-      setSelectedScheduleId(filteredSchedules[0].id);
-    }
-  }, [tab, filteredSchedules, selectedScheduleId]);
-
   const displayParts = articleParts.filter((p) => p !== "Constitution of India");
 
+  const navigateToChat = async (text: string, markReadId?: string) => {
+    setRedirectText(text);
+    setRedirecting(true);
+    if (markReadId) markArticleRead(markReadId);
+    // small delay so the overlay is visible briefly
+    await new Promise((r) => setTimeout(r, 120));
+    void router.push(`/chat?q=${encodeURIComponent(text)}`);
+  };
+
   return (
-    <div className="flex h-full flex-col lg:flex-row">
-      <div className="flex w-full flex-col min-h-0 border-b border-border lg:w-[22rem] lg:border-b-0 lg:border-r xl:w-96">
+    <div className="flex h-full min-h-0 flex-col lg:flex-row">
+      <div className="relative z-10 flex w-full flex-col min-h-0 border-b border-border lg:w-[22rem] lg:border-b-0 lg:border-r xl:w-96">
         <div className="space-y-3 border-b border-border p-4 flex-none">
           <div>
             <h1 className="font-serif text-lg font-semibold">Constitution Explorer</h1>
@@ -121,13 +67,13 @@ function ExplorerContent() {
             </TabsList>
           </Tabs>
 
-          <div className="relative">
-            <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="flex items-center gap-2">
+            <Search className="size-4 text-muted-foreground" />
             <Input
               placeholder={tab === "articles" ? "Article 25, keyword, title…" : "Search schedules…"}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pl-8"
+              className="flex-1"
             />
           </div>
 
@@ -136,13 +82,8 @@ function ExplorerContent() {
               <div className="flex flex-wrap gap-1.5">
                 <button
                   type="button"
-                  onClick={() => setPartFilter("all")}
-                  className={cn(
-                    "rounded-md px-2 py-1 text-[10px] transition-colors",
-                    partFilter === "all"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                  )}
+                  onClick={() => void navigateToChat("Explain the Constitution")}
+                  className={cn("rounded-md px-2 py-1 text-[10px] transition-colors bg-muted text-muted-foreground")}
                 >
                   All
                 </button>
@@ -150,13 +91,8 @@ function ExplorerContent() {
                   <button
                     key={part}
                     type="button"
-                    onClick={() => setPartFilter(part)}
-                    className={cn(
-                      "rounded-md px-2 py-1 text-[10px] transition-colors",
-                      partFilter === part
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    )}
+                    onClick={() => void navigateToChat(`Explain ${part}`)}
+                    className={cn("rounded-md px-2 py-1 text-[10px] transition-colors bg-muted text-muted-foreground")}
                   >
                     {part}
                   </button>
@@ -177,7 +113,7 @@ function ExplorerContent() {
           )}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-auto">
+        <div className="min-h-0 lg:flex-1 lg:overflow-auto">
           <div className="space-y-0.5 p-2">
             {tab === "articles" ? (
               filteredArticles.length === 0 ? (
@@ -187,13 +123,8 @@ function ExplorerContent() {
                   <button
                     key={article.id}
                     type="button"
-                    onClick={() => selectArticle(article.id)}
-                    className={cn(
-                      "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
-                      selectedArticleId === article.id
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "hover:bg-muted/50"
-                    )}
+                    onClick={() => void navigateToChat(`Explain ${article.number}`, article.id)}
+                    className={cn("w-full rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted/50")}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <Badge variant="outline" className="text-[10px] font-normal">
@@ -214,16 +145,8 @@ function ExplorerContent() {
                 <button
                   key={schedule.id}
                   type="button"
-                  onClick={() => {
-                    setSelectedScheduleId(schedule.id);
-                    setSelectedArticleId(null);
-                  }}
-                  className={cn(
-                    "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
-                    selectedScheduleId === schedule.id
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "hover:bg-muted/50"
-                  )}
+                  onClick={() => void navigateToChat(`Explain Schedule ${schedule.number}: ${schedule.title}`)}
+                  className={cn("w-full rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted/50")}
                 >
                   <Badge variant="outline" className="text-[10px] font-normal">
                     {schedule.number}
@@ -236,36 +159,19 @@ function ExplorerContent() {
         </div>
       </div>
 
-      <div className="hidden min-w-0 flex-1 lg:flex">
-        {tab === "articles" && selectedArticle ? (
-          <ArticleDetail
-            article={selectedArticle}
-            bookmarked={isBookmarked(selectedArticle.id)}
-            onToggleBookmark={toggleBookmark}
-            onMarkRead={markArticleRead}
-          />
-        ) : tab === "schedules" && selectedSchedule ? (
-          <ScheduleDetail schedule={selectedSchedule} />
-        ) : (
-          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-            Select an item to read
-          </div>
-        )}
+      <div className="flex-1 hidden lg:flex items-center justify-center">
+        <div className="text-muted-foreground text-sm">Open an article to chat about it.</div>
       </div>
 
-      {tab === "articles" && selectedArticle && (
-        <div className="border-t border-border lg:hidden">
-          <ArticleDetail
-            article={selectedArticle}
-            bookmarked={isBookmarked(selectedArticle.id)}
-            onToggleBookmark={toggleBookmark}
-            onMarkRead={markArticleRead}
-          />
-        </div>
-      )}
-      {tab === "schedules" && selectedSchedule && (
-        <div className="border-t border-border lg:hidden">
-          <ScheduleDetail schedule={selectedSchedule} />
+      {redirecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60">
+          <div className="rounded-lg border border-border/60 bg-card/90 p-4 flex items-center gap-3">
+            <Loader2 className="size-5 animate-spin text-amber-400" />
+            <div>
+              <div className="font-medium">Redirecting to chat…</div>
+              <div className="text-sm text-muted-foreground">{redirectText}</div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -25,7 +25,7 @@ export function SavedCaseCard({
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Gavel className="size-3.5 shrink-0 text-violet-400" />
             <Link
-              href={`/explorer?article=${savedCase.articleId}`}
+              href={`/chat?q=${encodeURIComponent(`Explain ${savedCase.articleNumber}`)}`}
               className="font-medium text-primary hover:underline"
             >
               {savedCase.articleNumber}

@@ -32,8 +32,52 @@ interface ConstitutionDataset {
 
 const dataset = raw as ConstitutionDataset;
 
+// Ensure a proper Preamble entry exists in the in-memory dataset.
+const PREAMBLE_ID = "preamble";
+const PREAMBLE_CONTENT =
+  "WE, THE PEOPLE OF INDIA, having solemnly resolved to constitute India into a SOVEREIGN SOCIALIST SECULAR DEMOCRATIC REPUBLIC and to secure to all its citizens: JUSTICE, social, economic and political; LIBERTY of thought, expression, belief, faith and worship;\nEQUALITY of status and of opportunity; and to promote among them all FRATERNITY assuring the dignity of the individual and the unity and integrity of the Nation; IN OUR CONSTITUENT ASSEMBLY this twenty-sixth day of November, 1949, do HEREBY ADOPT, ENACT AND GIVE TO OURSELVES THIS CONSTITUTION";
+const PREAMBLE_KEYWORDS = [
+  "preamble",
+  "justice",
+  "liberty",
+  "equality",
+  "fraternity",
+  "sovereign",
+  "socialist",
+  "secular",
+  "democratic",
+  "republic",
+];
+
+const processedArticles: ConstitutionArticle[] = [...dataset.articles];
+const preIdx = processedArticles.findIndex((a) => a.id === PREAMBLE_ID);
+if (preIdx >= 0) {
+  // Merge/override keys for consistency
+  processedArticles[preIdx] = {
+    ...processedArticles[preIdx],
+    id: PREAMBLE_ID,
+    number: "Preamble",
+    title: "Preamble",
+    part: "Preamble",
+    content: PREAMBLE_CONTENT,
+    summary: PREAMBLE_CONTENT,
+    keywords: PREAMBLE_KEYWORDS,
+  };
+} else {
+  // Insert preamble at the front so it behaves like a leading item
+  processedArticles.unshift({
+    id: PREAMBLE_ID,
+    number: "Preamble",
+    title: "Preamble",
+    part: "Preamble",
+    summary: PREAMBLE_CONTENT,
+    content: PREAMBLE_CONTENT,
+    keywords: PREAMBLE_KEYWORDS,
+  });
+}
+
 export const constitutionMeta = dataset.meta;
-export const constitutionArticles: ConstitutionArticle[] = dataset.articles;
+export const constitutionArticles: ConstitutionArticle[] = processedArticles;
 export const constitutionSchedules: ConstitutionSchedule[] = dataset.schedules.map((s) => ({
   ...s,
   keywords: s.keywords ?? [],
@@ -42,7 +86,11 @@ export const constitutionAmendments: ConstitutionAmendment[] = dataset.amendment
 
 const articleById = new Map(constitutionArticles.map((a) => [a.id, a]));
 const articleByKey = new Map(
-  dataset.articles.map((a) => [a.articleKey, a])
+  constitutionArticles.map((a) => {
+    const raw = dataset.articles.find((r) => r.id === a.id as string) as any;
+    const key = raw?.articleKey ?? (a.number || a.id).toString().toLowerCase().replace(/^article\s*/i, "");
+    return [key, a] as [string, ConstitutionArticle];
+  })
 );
 
 export const articleParts = [
@@ -63,6 +111,9 @@ export function getArticleByKey(key: string): ConstitutionArticle | undefined {
 
 export function findArticleByQuery(query: string): ConstitutionArticle | undefined {
   const trimmed = query.trim();
+  if (/preamble/i.test(trimmed)) {
+    return getArticleByKey("preamble");
+  }
   const articleMatch = trimmed.match(/(?:article|art\.?)\s*(\d+[a-z]?)/i);
   if (articleMatch) {
     return getArticleByKey(articleMatch[1]);

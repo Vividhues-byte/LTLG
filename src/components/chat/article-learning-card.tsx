@@ -146,7 +146,11 @@ export function ArticleLearningCard({
                     relatedArticles.map((rel) => (
                       <Link
                         key={rel.id}
-                        href={`/explorer?article=${rel.id}`}
+                        href={`/chat?q=${encodeURIComponent(
+                          rel.number.toLowerCase().includes("preamble")
+                            ? "Explain the Preamble"
+                            : `Explain ${rel.number}`
+                        )}`}
                         className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2 text-sm transition-colors hover:bg-muted/50"
                       >
                         <span>
