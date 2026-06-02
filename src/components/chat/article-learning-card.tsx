@@ -175,40 +175,4 @@ export function ArticleLearningCard({
     </Card>
   );
 }
-              <AccordionContent>
-                <div className="flex flex-col gap-2">
-                  {relatedArticles.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No related articles listed.</p>
-                  ) : (
-                    relatedArticles.map((rel) => (
-                      <Link
-                        key={rel.id}
-                        href={`/explorer?article=${rel.id}`}
-                        className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2 text-sm transition-colors hover:bg-muted/50"
-                      >
-                        <span>
-                          <span className="font-medium">{rel.number}</span>
-                          <span className="text-muted-foreground"> — {rel.title}</span>
-                        </span>
-                        <Scale className="size-3.5 shrink-0 text-muted-foreground" />
-                      </Link>
-                    ))
-                  )}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
 
-        <Separator />
-
-        <div className="px-4 pb-4 sm:px-6 sm:pb-6">
-          <InlineArticleQuiz
-            questions={learning.quizQuestions}
-            articleNumber={article.number}
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
