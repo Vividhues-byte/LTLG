@@ -101,8 +101,8 @@ function ExplorerContent() {
 
   return (
     <div className="flex h-full flex-col lg:flex-row">
-      <div className="flex w-full flex-col border-b border-border lg:w-[22rem] lg:border-b-0 lg:border-r xl:w-96">
-        <div className="space-y-3 border-b border-border p-4">
+      <div className="flex w-full flex-col min-h-0 border-b border-border lg:w-[22rem] lg:border-b-0 lg:border-r xl:w-96">
+        <div className="space-y-3 border-b border-border p-4 flex-none mb-4">
           <div>
             <h1 className="font-serif text-lg font-semibold">Constitution Explorer</h1>
             <p className="text-xs text-muted-foreground">
@@ -132,38 +132,36 @@ function ExplorerContent() {
           </div>
 
           {tab === "articles" && (
-            <>
-              <ScrollArea className="max-h-24">
-                <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPartFilter("all")}
+                  className={cn(
+                    "rounded-md px-2 py-1 text-[10px] transition-colors",
+                    partFilter === "all"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  All
+                </button>
+                {displayParts.map((part) => (
                   <button
+                    key={part}
                     type="button"
-                    onClick={() => setPartFilter("all")}
+                    onClick={() => setPartFilter(part)}
                     className={cn(
                       "rounded-md px-2 py-1 text-[10px] transition-colors",
-                      partFilter === "all"
+                      partFilter === part
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground"
                     )}
                   >
-                    All
+                    {part.replace(/^Part [IVX]+A? — /, "P").slice(0, 22)}
                   </button>
-                  {displayParts.map((part) => (
-                    <button
-                      key={part}
-                      type="button"
-                      onClick={() => setPartFilter(part)}
-                      className={cn(
-                        "rounded-md px-2 py-1 text-[10px] transition-colors",
-                        partFilter === part
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {part.replace(/^Part [IVX]+A? — /, "P").slice(0, 22)}
-                    </button>
-                  ))}
-                </div>
-              </ScrollArea>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={() => setBookmarksOnly((b) => !b)}
@@ -175,11 +173,11 @@ function ExplorerContent() {
                 <Bookmark className={cn("size-3.5", bookmarksOnly && "fill-current")} />
                 Bookmarks only
               </button>
-            </>
+            </div>
           )}
         </div>
 
-        <ScrollArea className="min-h-0 flex-1">
+        <div className="min-h-0 flex-1 overflow-auto">
           <div className="space-y-0.5 p-2">
             {tab === "articles" ? (
               filteredArticles.length === 0 ? (
@@ -235,7 +233,7 @@ function ExplorerContent() {
               ))
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       <div className="hidden min-w-0 flex-1 lg:flex">
