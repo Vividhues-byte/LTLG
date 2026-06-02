@@ -9,31 +9,31 @@ const source = JSON.parse(
 
 const PART_RANGES = [
   { part: "Preamble", test: (n) => n === "preamble" },
-  { part: "Part I — The Union and its Territory", min: 1, max: 4 },
-  { part: "Part II — Citizenship", min: 5, max: 11 },
-  { part: "Part III — Fundamental Rights", min: 12, max: 35 },
-  { part: "Part IV — Directive Principles of State Policy", min: 36, max: 51 },
-  { part: "Part IVA — Fundamental Duties", letters: ["51a"] },
-  { part: "Part V — The Union", min: 52, max: 151 },
-  { part: "Part VI — The States", min: 152, max: 237 },
-  { part: "Part VIII — The Union Territories", min: 239, max: 242 },
-  { part: "Part IX — The Panchayats", min: 243, max: 243 },
-  { part: "Part IXA — The Municipalities", min: 243, max: 243 },
-  { part: "Part X — The Scheduled and Tribal Areas", min: 244, max: 244 },
-  { part: "Part XI — Relations between the Union and the States", min: 245, max: 263 },
-  { part: "Part XII — Finance, Property, Contracts and Suits", min: 264, max: 300 },
-  { part: "Part XII — Finance, Property, Contracts and Suits", letters: ["300a"] },
-  { part: "Part XIII — Trade, Commerce and Intercourse", min: 301, max: 307 },
-  { part: "Part XIV — Services under the Union and the States", min: 308, max: 323 },
-  { part: "Part XIVA — Tribunals", min: 323, max: 323 },
-  { part: "Part XV — Elections", min: 324, max: 329 },
-  { part: "Part XVI — Special Provisions", min: 330, max: 342 },
-  { part: "Part XVII — Official Language", min: 343, max: 351 },
-  { part: "Part XVIII — Emergency Provisions", min: 352, max: 360 },
-  { part: "Part XIX — Miscellaneous", min: 361, max: 367 },
-  { part: "Part XX — Amendment of the Constitution", min: 368, max: 368 },
-  { part: "Part XXI — Temporary, Transitional and Special Provisions", min: 369, max: 392 },
-  { part: "Part XXII — Short Title, Commencement, Authoritative Texts", min: 393, max: 395 },
+  { part: "The Union and its Territories", min: 1, max: 4 },
+  { part: "Citizenship", min: 5, max: 11 },
+  { part: "Fundamental Rights", min: 12, max: 35 },
+  { part: "Directive Principles", min: 36, max: 51 },
+  { part: "Fundamental Duties", letters: ["51a"] },
+  { part: "The Union", min: 52, max: 151 },
+  { part: "The States", min: 152, max: 237 },
+  { part: "The Union Territories", min: 239, max: 242 },
+  { part: "The Panchayats", min: 243, max: 243 },
+  { part: "The Municipalities", min: 243, max: 243 },
+  { part: "Scheduled and Tribal Areas", min: 244, max: 244 },
+  { part: "Relations between the Union and the States", min: 245, max: 263 },
+  { part: "Finance, Property, Contracts", min: 264, max: 300 },
+  { part: "Finance, Property, Contracts", letters: ["300a"] },
+  { part: "Trade, Commerce and Intercourse", min: 301, max: 307 },
+  { part: "Services under the Union", min: 308, max: 323 },
+  { part: "Tribunals", min: 323, max: 323 },
+  { part: "Elections", min: 324, max: 329 },
+  { part: "Special Provisions", min: 330, max: 342 },
+  { part: "Official Language", min: 343, max: 351 },
+  { part: "Emergency Provisions", min: 352, max: 360 },
+  { part: "Miscellaneous", min: 361, max: 367 },
+  { part: "Amendment of the Constitution", min: 368, max: 368 },
+  { part: "Temporary, Transitional", min: 369, max: 392 },
+  { part: "Short Title and Commencement", min: 393, max: 395 },
 ];
 
 function normalizeArticleKey(raw) {
@@ -93,19 +93,65 @@ function buildSummary(title, content) {
 }
 
 function extractKeywords(title, content) {
-  const words = `${title} ${content}`
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter((w) => w.length > 4);
+  const text = `${title} ${content}`.toLowerCase();
+
+  // Base word extraction (frequent meaningful words)
+  const words = text.replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 4);
   const freq = {};
   for (const w of words) {
     freq[w] = (freq[w] || 0) + 1;
   }
-  return Object.entries(freq)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([w]) => w);
+  const top = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([w]) => w);
+
+  // Extra curated terms to improve discoverability
+  const EXTRA_TERMS = [
+    "indian constitution",
+    "constitution of india",
+    "constitution articles",
+    "constitution schedules",
+    "fundamental rights",
+    "fundamental duties",
+    "directive principles",
+    "preamble",
+    "parliament",
+    "lok sabha",
+    "rajya sabha",
+    "president of india",
+    "prime minister",
+    "supreme court",
+    "high court",
+    "judiciary",
+    "constitutional law",
+    "indian legal system",
+    "constitution amendment",
+    "article 14",
+    "article 19",
+    "article 21",
+    "article 32",
+    "article 226",
+    "emergency provisions",
+    "federalism",
+    "citizenship",
+    "writ petition",
+    "judicial review",
+    "basic structure",
+    "landmark judgments",
+    "case laws",
+    "clat",
+    "ailet",
+    "upsc polity",
+    "law student",
+    "advocate",
+    "legal news",
+    "supreme court judgments",
+    "constitution learning",
+    "indian law",
+    "legal education",
+  ];
+
+  const extras = EXTRA_TERMS.filter((term) => text.includes(term));
+
+  return Array.from(new Set([...top, ...extras])).slice(0, 12);
 }
 
 const articles = source.map((row) => {

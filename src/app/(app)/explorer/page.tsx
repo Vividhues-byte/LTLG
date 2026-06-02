@@ -158,7 +158,7 @@ function ExplorerContent() {
                         : "bg-muted text-muted-foreground"
                     )}
                   >
-                    {part.replace(/^Part [IVX]+A? — /, "P").slice(0, 22)}
+                    {part}
                   </button>
                 ))}
               </div>
