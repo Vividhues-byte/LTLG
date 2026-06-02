@@ -61,11 +61,12 @@ function resolvePart(key) {
     }
   }
 
-  if (num >= 243 && num <= 243) return "Part IX — The Panchayats";
-  if (full.startsWith("243") && suffix) return "Part IXA — The Municipalities";
-  if (num >= 323 && suffix) return "Part XIVA — Tribunals";
+  if (num >= 243 && num <= 243) return "The Panchayats";
+  if (full.startsWith("243") && suffix) return "The Municipalities";
+  if (num >= 323 && suffix) return "Tribunals";
 
   return "Constitution of India";
+
 }
 
 function toDisplayNumber(key) {
