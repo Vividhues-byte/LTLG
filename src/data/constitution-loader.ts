@@ -87,7 +87,7 @@ export const constitutionAmendments: ConstitutionAmendment[] = dataset.amendment
 const articleById = new Map(constitutionArticles.map((a) => [a.id, a]));
 const articleByKey = new Map(
   constitutionArticles.map((a) => {
-    const raw = dataset.articles.find((r) => r.id === a.id as string) as any;
+    const raw = dataset.articles.find((r) => r.id === a.id);
     const key = raw?.articleKey ?? (a.number || a.id).toString().toLowerCase().replace(/^article\s*/i, "");
     return [key, a] as [string, ConstitutionArticle];
   })
