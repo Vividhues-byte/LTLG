@@ -1,63 +1,40 @@
 import React from "react";
 
+// Lightweight renderer tailored for AI-generated content.
+// Strips leftover markdown artifacts and produces clean, friendly paragraphs.
 export function MarkdownRenderer({ text }: { text: string }) {
-  const blocks = text.split(/\n{2,}/);
-  
-  return (
-    <div className="space-y-3">
-      {blocks.map((block, idx) => {
-        const trimmed = block.trim();
-        if (!trimmed) return null;
+  if (!text) return null;
 
-        // Heading 3
-        if (trimmed.startsWith("### ")) {
+  // Remove raw markdown tokens we don't want to display literally
+  const cleaned = String(text)
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/`/g, "")
+    .replace(/(^|\n)>\s?/g, "\n")
+    .replace(/(^|\n)#+\s*/g, "\n")
+    .replace(/\r/g, "")
+    .trim();
+
+  // Split into paragraphs by two or more newlines
+  const paragraphs = cleaned.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+
+  return (
+    <div className="space-y-4 text-sm leading-relaxed text-foreground">
+      {paragraphs.map((p, i) => {
+        // Detect simple bullet blocks that use '-' at line start
+        if (/^(-|\*)\s+/m.test(p)) {
+          const items = p.split(/\n/).map((l) => l.replace(/^(-|\*)\s+/, "").trim()).filter(Boolean);
           return (
-            <h3 key={idx} className="text-sm font-semibold text-foreground mt-3 mb-1">
-              {parseInline(trimmed.replace(/^###\s+/, ""))}
-            </h3>
-          );
-        }
-        
-        // Bullet list
-        if (trimmed.startsWith("- ")) {
-          const items = trimmed.split("\n").filter(i => i.trim().startsWith("- "));
-          return (
-            <ul key={idx} className="list-disc space-y-1.5 pl-5">
-              {items.map((item, i) => (
-                <li key={i}>{parseInline(item.replace(/^-\s+/, ""))}</li>
+            <ul key={i} className="list-disc ml-5 space-y-1">
+              {items.map((it, idx) => (
+                <li key={idx}>{it}</li>
               ))}
             </ul>
           );
         }
 
-        // Default Paragraph
-        return (
-          <p key={idx} className="whitespace-pre-wrap">
-            {parseInline(trimmed)}
-          </p>
-        );
+        return <p key={i}>{p}</p>;
       })}
     </div>
   );
-}
-
-function parseInline(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return (
-        <strong key={i} className="font-semibold text-foreground">
-          {part.slice(2, -2)}
-        </strong>
-      );
-    }
-    if (part.startsWith("*") && part.endsWith("*")) {
-      return (
-        <em key={i} className="italic text-foreground/80">
-          {part.slice(1, -1)}
-        </em>
-      );
-    }
-    return <span key={i}>{part}</span>;
-  });
 }
