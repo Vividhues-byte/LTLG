@@ -84,6 +84,27 @@ export function searchArticles(query: string): ConstitutionArticle[] {
   const direct = findArticleByQuery(q);
   if (direct) return [direct];
 
+  // Topic shortcuts for common student queries / exam keywords
+  const topicMap: Record<string, string[]> = {
+    clat: ["14", "19", "21", "32", "226"],
+    ailet: ["14", "21", "32"],
+    upsc: ["14", "21", "32"],
+    "law student": ["14", "19", "21", "32"],
+    "fundamental rights": [],
+    "fundamental duties": ["51a"],
+    "directive principles": [],
+    "emergency provisions": [],
+    "official language": [],
+  };
+
+  if (topicMap[q]) {
+    const keys = topicMap[q];
+    // If explicit keys provided, return those; otherwise fall back to part matching below
+    if (keys.length > 0) {
+      return keys.map((k) => getArticleByKey(k)).filter(Boolean) as ConstitutionArticle[];
+    }
+  }
+
   return constitutionArticles.filter(
     (article) =>
       article.number.toLowerCase().includes(q) ||
