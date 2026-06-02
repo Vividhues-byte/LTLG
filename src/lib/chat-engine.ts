@@ -52,7 +52,7 @@ export function generateChatResponse(userMessage: string): ChatEngineResponse {
     return {
       payload: {
         type: "text",
-        text: "Ask about any constitutional article — e.g. *Article 25*, *Article 300A*, or *Article 51A*. You'll receive the complete text plus explanation.",
+        text: `Ask about any constitutional article — e.g. Article 25, Article 300A, or Article 51A. You'll receive the complete text plus a short explanation, landmark cases, and a quick quiz.`,
       },
       relatedArticleIds: [],
     };
@@ -62,9 +62,9 @@ export function generateChatResponse(userMessage: string): ChatEngineResponse {
     return {
       payload: {
         type: "text",
-        text: `Namaste! Welcome to **LTLG Constitution Chat** — your premium legal learning assistant covering **all ${searchArticles("").length} constitutional articles**.
+        text: `Namaste! Welcome to LTLG Constitution Chat — your legal learning assistant covering all ${searchArticles("").length} constitutional articles.
 
-Ask any article by number (Article 2, 51A, 300A…), keyword, or topic. Every response includes full text, AI explanation, landmark cases, related articles, and a quiz.`,
+Ask an article number (Article 2, 51A, 300A), a keyword, or a topic. Responses include the full text (hidden by default), a short explanation, landmark cases, related articles, and a short quiz.`,
       },
       relatedArticleIds: [],
     };
@@ -148,7 +148,7 @@ Ask any article by number (Article 2, 51A, 300A…), keyword, or topic. Every re
   return {
     payload: {
       type: "text",
-      text: `No exact match found. Try:\n• **Article [number]** — e.g. Article 25, Article 300A\n• Keywords — equality, education, emergency\n• Topics — Fundamental Rights, Directive Principles\n\nThe database includes all constitutional articles with full text.`,
+      text: `No exact match found. Try:\n• Article [number] — e.g. Article 25 or Article 300A\n• Keywords — equality, education, emergency\n• Topics — Fundamental Rights, Directive Principles\n\nThis database contains all constitutional articles with full text.`,
     },
     relatedArticleIds: [],
   };

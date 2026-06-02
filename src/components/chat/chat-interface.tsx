@@ -43,7 +43,7 @@ const WELCOME: ChatMessage = {
   timestamp: new Date().toISOString(),
   payload: {
     type: "text",
-    text: `Welcome to **LTLG Constitution Chat** — a premium legal learning interface covering all **${constitutionMeta.articleCount} articles** of the Indian Constitution.\n\nAsk *Article 2*, *Article 25*, *Article 300A*, or any keyword. You'll receive the **complete constitutional text** plus explanation, cases, and a quiz.`,
+    text: `Welcome to LTLG Constitution Chat — a friendly guide to India's Constitution covering ${constitutionMeta.articleCount} articles.\n\nAsk an article number (e.g. Article 25, Article 300A), a keyword, or a topic. You'll get a short plain-English explanation, why it matters, one example, key points, landmark cases, and a short quiz.`,
   },
 };
 

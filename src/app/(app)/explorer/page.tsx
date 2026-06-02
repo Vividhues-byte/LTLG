@@ -102,7 +102,7 @@ function ExplorerContent() {
   return (
     <div className="flex h-full flex-col lg:flex-row">
       <div className="flex w-full flex-col min-h-0 border-b border-border lg:w-[22rem] lg:border-b-0 lg:border-r xl:w-96">
-        <div className="space-y-3 border-b border-border p-4 flex-none mb-4">
+        <div className="space-y-3 border-b border-border p-4 flex-none">
           <div>
             <h1 className="font-serif text-lg font-semibold">Constitution Explorer</h1>
             <p className="text-xs text-muted-foreground">
