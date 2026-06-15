@@ -14,8 +14,9 @@ import { useProgressContext } from "@/contexts/progress-context";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArticleContextChat } from "@/components/chat/article-context-chat";
+import { articleToQAContext, scheduleToQAContext } from "@/lib/article-qa-context";
 import { cn } from "@/lib/utils";
-// import type { ConstitutionSchedule } from "@/data/constitution-loader";
 
 function ExplorerContent() {
   const { toggleBookmark, isBookmarked, markArticleRead, progress } = useProgressContext();
@@ -264,14 +265,23 @@ function ExplorerContent() {
                   )}
                 </div>
               </div>
+
+              <ArticleContextChat
+                context={articleToQAContext(selectedArticle)}
+                onOpenRelated={(id) => setSelectedArticleId(id)}
+              />
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <Badge variant="outline">{selectedSchedule?.number}</Badge>
                 <h2 className="text-xl font-serif">{selectedSchedule?.title}</h2>
               </div>
+              <p className="text-sm text-muted-foreground">{selectedSchedule?.summary}</p>
               <div className="prose max-w-none whitespace-pre-wrap">{selectedSchedule?.content}</div>
+              {selectedSchedule && (
+                <ArticleContextChat context={scheduleToQAContext(selectedSchedule)} />
+              )}
             </div>
           )}
         </div>

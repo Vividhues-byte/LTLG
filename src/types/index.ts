@@ -92,3 +92,37 @@ export interface ChatMessage {
   payload?: ChatPayload;
   relatedArticleIds?: string[];
 }
+
+export type ArticleContextKind =
+  | "article"
+  | "schedule"
+  | "amendment"
+  | "case"
+  | "flashcard"
+  | "concept";
+
+export interface ArticleQAContext {
+  kind: ArticleContextKind;
+  id: string;
+  label: string;
+  title: string;
+  category: string;
+  content: string;
+  keywords?: string[];
+}
+
+export interface ArticleQAResponse {
+  directAnswer: string;
+  provision: string;
+  explanation: string;
+  examTip?: string;
+  relatedArticles: Array<{ id: string; number: string; title: string }>;
+}
+
+export interface ArticleContextMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  response?: ArticleQAResponse;
+  timestamp: string;
+}

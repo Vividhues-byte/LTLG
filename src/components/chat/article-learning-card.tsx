@@ -24,6 +24,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { articleToQAContext } from "@/lib/article-qa-context";
+import { ArticleContextChat } from "./article-context-chat";
 import { InlineArticleQuiz } from "./inline-article-quiz";
 import { MarkdownRenderer } from "./markdown-renderer";
 
@@ -169,7 +171,8 @@ export function ArticleLearningCard({
 
         <Separator />
 
-        <div className="px-4 pb-4 sm:px-6 sm:pb-6">
+        <div className="space-y-4 px-4 pb-4 sm:px-6 sm:pb-6">
+          <ArticleContextChat context={articleToQAContext(article)} />
           <InlineArticleQuiz
             questions={learning.quizQuestions}
             articleNumber={article.number}
